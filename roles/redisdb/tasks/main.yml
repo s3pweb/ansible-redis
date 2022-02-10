@@ -9,10 +9,12 @@
 #       "tag:stack_server_type": "{{cluster}}:redisdb"
 #   become: false
 ## but for demo these values simply hardcoded
-- set_fact: cluster="testcluster1"
+- set_fact:
+    cluster: "{{ cluster }}"
 ## here we assume that hostname is like redisdb-mysubcluster1.testcluster.example.com
 - set_fact:
-    subcluster: "{{ansible_hostname|regex_replace('\\d+$', '')}}"
+        #subcluster: "{{ansible_hostname|regex_replace('\\d+$', '')}}"
+    subcluster: "{{ subcluster }}"
 #
 
 # Setup third-party tools for debugging purpose
