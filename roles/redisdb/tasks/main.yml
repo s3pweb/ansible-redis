@@ -1,5 +1,4 @@
 ---
-- include_vars: config.yml
 
 ## NOTE: There are many ways to let Ansible know what cluster/subcluster you are deploying
 ## here for example we are using "ec2_instance_facts" module to get AWS EC2 tags
