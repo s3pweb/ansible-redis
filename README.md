@@ -1,3 +1,6 @@
+# Purposes of this fork
+* create a collection of [forked](https://github.com/Quiq/ha-redis) roles
+
 # HA Redis
 Ansible role with highly available Redis cluster. Can be used when you need more than just caching servers and you care about every value stored in Redis.
 
