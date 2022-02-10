@@ -54,16 +54,22 @@
   args:
     creates: "{{ansible_env.HOME}}/.kernel.mm.transparent_hugepage.never"
 
+- name: Check grub is installed
+  ansible.builtin.stat:
+    path: /etc/default/grub
+  register: grub_stat
+
 - name: Ensure auditing for processes that start prior to auditd is enabled 1/2 (configure grub)
   replace:
     path: /etc/default/grub
     regexp: 'GRUB_CMDLINE_LINUX_DEFAULT=""'
     replace: 'GRUB_CMDLINE_LINUX_DEFAULT="console=tty1 console=ttyS0 transparent_hugepage=never"'
   register: grub
+  when: grub_stat.stat.exists
 
 - name: Ensure auditing for processes that start prior to auditd is enabled 2/2 (update initrd image)
   shell: update-grub
-  when: grub.changed
+  when: grub_stat.stat.exists and grub.changed
 
 # Add reserved ports we use to the ephemeral range
 - name: Reserve tcp ports in ephemeral port range

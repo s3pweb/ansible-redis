@@ -20,9 +20,9 @@ haproxy_sentinel_ssl_port: 16379
 instances:
   testcluster1:
     redisdb-mytest:
-      srv1: 10.0.7.72
-      srv2: 10.0.7.142
-      srv3: 10.0.7.202
+      srv1: 172.17.0.2
+      srv2: 172.17.0.3
+      srv3: 172.17.0.4
 
   # testcluster2:
   #   redisdb:
