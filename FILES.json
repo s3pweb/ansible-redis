@@ -1,0 +1,292 @@
+{
+ "files": [
+  {
+   "name": ".",
+   "ftype": "dir",
+   "chksum_type": null,
+   "chksum_sha256": null,
+   "format": 1
+  },
+  {
+   "name": "roles",
+   "ftype": "dir",
+   "chksum_type": null,
+   "chksum_sha256": null,
+   "format": 1
+  },
+  {
+   "name": "roles/redisdb-misc",
+   "ftype": "dir",
+   "chksum_type": null,
+   "chksum_sha256": null,
+   "format": 1
+  },
+  {
+   "name": "roles/redisdb-misc/templates",
+   "ftype": "dir",
+   "chksum_type": null,
+   "chksum_sha256": null,
+   "format": 1
+  },
+  {
+   "name": "roles/redisdb-misc/templates/redis_exporter.config",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "57770a4cb3080cf94bd66ba2edc508db57131381c1a87547aafe7cb416f1d464",
+   "format": 1
+  },
+  {
+   "name": "roles/redisdb-misc/templates/redis-backup-config.yml",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "2da0176dbb54f0f9975e56f49aa5039ced783774f195165aea67a8bf425bc3f9",
+   "format": 1
+  },
+  {
+   "name": "roles/redisdb-misc/templates/redis-commander.json",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "275acfbea79a79f53455bc293e1647cf7b2d8349babed565a0dd5e009100bfc1",
+   "format": 1
+  },
+  {
+   "name": "roles/redisdb-misc/tasks",
+   "ftype": "dir",
+   "chksum_type": null,
+   "chksum_sha256": null,
+   "format": 1
+  },
+  {
+   "name": "roles/redisdb-misc/tasks/main.yml",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "4f34d78f83f67b9cd179b5025f7627a5cde3b9059549ebd926c9694420c6a929",
+   "format": 1
+  },
+  {
+   "name": "roles/redisdb",
+   "ftype": "dir",
+   "chksum_type": null,
+   "chksum_sha256": null,
+   "format": 1
+  },
+  {
+   "name": "roles/redisdb/templates",
+   "ftype": "dir",
+   "chksum_type": null,
+   "chksum_sha256": null,
+   "format": 1
+  },
+  {
+   "name": "roles/redisdb/templates/haproxy.cfg",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "7357fdc7b5af00dbd4f206d4d48144f6d4d69eb0b3ff744e22e2defab37c1810",
+   "format": 1
+  },
+  {
+   "name": "roles/redisdb/templates/sentinel.conf.tmpl",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "a9e6ae588259b8dd4ea1a9d13ecdc11b7c6c7c2d2e2abe8e371d82c2dd14469d",
+   "format": 1
+  },
+  {
+   "name": "roles/redisdb/templates/redis.conf",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "82fae556478fbd3b56a5c659f7eed30a4ee2c07f124ad68e9b741d4d0c2c1dde",
+   "format": 1
+  },
+  {
+   "name": "roles/redisdb/vars",
+   "ftype": "dir",
+   "chksum_type": null,
+   "chksum_sha256": null,
+   "format": 1
+  },
+  {
+   "name": "roles/redisdb/vars/main.yml",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "ad2bd9796de026bb7553837d5633464862b0c233f31bc3fabafb384fa00f4082",
+   "format": 1
+  },
+  {
+   "name": "roles/redisdb/tasks",
+   "ftype": "dir",
+   "chksum_type": null,
+   "chksum_sha256": null,
+   "format": 1
+  },
+  {
+   "name": "roles/redisdb/tasks/service.yml",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "e4e899834f39bbf8c57f7a3f197b450c06eedcc3c8cee4515ba02848be4b84fa",
+   "format": 1
+  },
+  {
+   "name": "roles/redisdb/tasks/config.yml",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "879e2374e28694d1eb8a851035290c9f3492d871062c6a8cc679a3cb6d58a242",
+   "format": 1
+  },
+  {
+   "name": "roles/redisdb/tasks/main.yml",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "e4a00122d6a0b54e2d78e4901bda188854f02aba4ff8ebdf76d668457777efc4",
+   "format": 1
+  },
+  {
+   "name": "roles/redisdb/files",
+   "ftype": "dir",
+   "chksum_type": null,
+   "chksum_sha256": null,
+   "format": 1
+  },
+  {
+   "name": "roles/redisdb/files/example.key",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "74924ab0fca30340d4c3d51526e3a951a33d752f39579b66b872ebed7da5ec23",
+   "format": 1
+  },
+  {
+   "name": "roles/redisdb/files/example.crt",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "ca71374aee2b3c417398e86e08c0460c8e84c5f7215d72869e441f52cd579892",
+   "format": 1
+  },
+  {
+   "name": "images",
+   "ftype": "dir",
+   "chksum_type": null,
+   "chksum_sha256": null,
+   "format": 1
+  },
+  {
+   "name": "images/network-diagram.png",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "5f8fa4eb6d32c7283bf81d24bb642bb48cc4eb6ac45f8c2cade9ac2197059d8a",
+   "format": 1
+  },
+  {
+   "name": "images/haproxy-diagram.png",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "ccb4c432acc243ac2cf393a0abc21db092a1c3b9b44d4635688e220a6bbbd02a",
+   "format": 1
+  },
+  {
+   "name": "images/port-map.png",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "61e010e090b3c59d605fb3c49cd0cae2e97d69d03bcf13845cbdd2ff1ed92858",
+   "format": 1
+  },
+  {
+   "name": "plugins",
+   "ftype": "dir",
+   "chksum_type": null,
+   "chksum_sha256": null,
+   "format": 1
+  },
+  {
+   "name": "plugins/README.md",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "fd9c45a7bb36b6d48ee5b70178f581d0eb452dedd323e32f763644865613a611",
+   "format": 1
+  },
+  {
+   "name": "scripts",
+   "ftype": "dir",
+   "chksum_type": null,
+   "chksum_sha256": null,
+   "format": 1
+  },
+  {
+   "name": "scripts/common_redis.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "cfb63934743a44a406042e787b9c0a210e969ad5cd803caf83d0ea7aef27fc6e",
+   "format": 1
+  },
+  {
+   "name": "scripts/redis-status.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "c35ecf31573744488abb597804ed605d551e69432b5649d9946e9de7a15172c1",
+   "format": 1
+  },
+  {
+   "name": "scripts/redis-failover.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "eb7cc257936d54622ff39aca0e7883f5548bfdbb74caba7b2f57bc7df097f15b",
+   "format": 1
+  },
+  {
+   "name": "scripts/redis-commander.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "9ef60f51a668562b21dafd76e1d2e317e3b2bb33fe7d7e378d4a161b3e2b4d4b",
+   "format": 1
+  },
+  {
+   "name": "scripts/README.md",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "f33fe718fcc39e24063064967b86c1d08cb85d025babcf970affcb137542b2e8",
+   "format": 1
+  },
+  {
+   "name": "scripts/redis-backup.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "2715d953647183882d374f2aeed55f93a400391c4f3257d15f7a554c8ee20146",
+   "format": 1
+  },
+  {
+   "name": "scripts/redis-get-master.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "bdde2631f898d3ad459125899c4a57a5ba0dd37b73c5df69e5d9d3d12f03dd22",
+   "format": 1
+  },
+  {
+   "name": "group_vars",
+   "ftype": "dir",
+   "chksum_type": null,
+   "chksum_sha256": null,
+   "format": 1
+  },
+  {
+   "name": "group_vars/all",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "67e8509c9746a7be02cb4c94ed28245f96a80e8225426febdf88152e640317c2",
+   "format": 1
+  },
+  {
+   "name": "README.md",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "6eb1e35b06256d9a870cd1e638e75dc7366441f90631a541ec253349c20b3049",
+   "format": 1
+  },
+  {
+   "name": "LICENSE",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+   "format": 1
+  }
+ ],
+ "format": 1
+}
