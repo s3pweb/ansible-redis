@@ -1,0 +1,15 @@
+---
+
+haproxy_version: 2.4.8-alpine
+redis_version: 6.2.6-alpine
+redis_exporter_version: 20191114
+redis_commander_version: 20191212
+haproxy_exporter_version: 20190408
+
+redis_port: 36379
+sentinel_port: 26379
+haproxy_api_port: 9899
+haproxy_redis_local_port: 46379
+haproxy_redis_local_ssl_port: 56379
+haproxy_redis_ssl_port: 6379
+haproxy_sentinel_ssl_port: 16379
