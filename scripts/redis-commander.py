@@ -13,24 +13,22 @@ global CONFIG_FILES, CONFIG, SECRETS, DEBUG
 def run_command(args):
     """Run command."""
     domain = CONFIG['domain']
-    databases = {k: v['port_offset'] for k, v in CONFIG['services'][args.cluster][args.subcluster].items()}
+    databases = {k: v['port_offset'] for k, v in CONFIG['services'].items()}
     databases = {k: databases[k] for k in sorted(databases, key=databases.get)}
     if args.db in databases:
         databases = {args.db: databases[args.db]}
     elif args.db is not None:
-        print('No such database in the cluster.')
+        print('No such database')
         print(f'Databases: {list(databases.keys())}')
         sys.exit(1)
 
-    print(f'Cluster: {args.cluster}')
-    print(f'Subcluster: {args.subcluster}')
     print(f'Databases and port offsets: {databases}')
 
     # Resolve host aliases.
-    host_aliases = [i for i in CONFIG['instances'][args.cluster][args.subcluster]]
+    host_aliases = [i for i in CONFIG['instances']]
     hostnames = []
     for i in range(1, len(host_aliases)+1):
-        host = f'{args.subcluster}{i}.{args.cluster}.{domain}'
+        host = f'redis{i}.{domain}'
 
         if args.host and args.host != host:
             continue
@@ -54,7 +52,7 @@ def run_command(args):
     redis_obj = common.Redis(DEBUG, verbose=True)
     for db, port_offset in databases.items():
         print(f'DB: {db}')
-        password = SECRETS[args.cluster][args.subcluster][db]['password']
+        password = SECRETS[db]['password']
         direct_redis_port = CONFIG['haproxy_redis_local_ssl_port'] + port_offset
         sentinel_port = CONFIG['haproxy_sentinel_ssl_port'] + port_offset
 
@@ -91,8 +89,6 @@ def run_command(args):
 def main():
     """Main."""
     parser = argparse.ArgumentParser(description='Run command on each redis/sentinel instance')
-    parser.add_argument('--cluster', '-c', help='cluster name', required=True)
-    parser.add_argument('--subcluster', '-s', help='subcluster name', default='redisdb')
     parser.add_argument('--db', '-d', help='redis db name')
     parser.add_argument('--host', help='redis host to make changes instead of all')
     parser.add_argument('--sentinel', help='apply to sentinel instead of redis', action='store_true')

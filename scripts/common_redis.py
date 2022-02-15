@@ -133,55 +133,12 @@ class Redis:
 
 def check_arguments(args, config_files, config, secrets, db_arg_check=True):
     """Check arguments passed to the scripts."""
-    if args.cluster not in config['instances']:
-        print('ERROR: no such cluster defined in [instances] section of the config file.')
+    if args.db not in config['services']:
+        print(f'ERROR: no such db defined in [services] section of the config file.')
         print(f'Check {config_files["REDIS_CONFIG"]}')
         sys.exit(1)
 
-    if args.cluster not in config['services']:
-        print('ERROR: no such cluster defined in [services] section of the config file.')
-        print(f'Check {config_files["REDIS_CONFIG"]}')
-        sys.exit(1)
-
-    if args.cluster not in secrets:
-        print('ERROR: no such cluster defined in the password file.')
+    if args.db not in secrets:
+        print(f'ERROR: no such db defined in the password file.')
         print(f'Check {config_files["REDIS_SECRETS"]}')
         sys.exit(1)
-
-    subclusters = {args.subcluster: ''}
-    if hasattr(args, 'target_subcluster'):
-        if args.subcluster == args.target_subcluster:
-            print('ERROR: subcluster and target subcluster cannot be the same.')
-            sys.exit(1)
-
-        if args.target_subcluster:
-            subclusters[args.target_subcluster] = 'target '
-
-    for subcluster, descr in subclusters.items():
-        if subcluster not in config['instances'][args.cluster]:
-            print(f'ERROR: no such {descr}subcluster defined for "{args.cluster}" cluster in [instances] section of the config file.')
-            print(f'Check {config_files["REDIS_CONFIG"]}')
-            sys.exit(1)
-
-        if subcluster not in config['services'][args.cluster]:
-            print(f'ERROR: no such {descr}subcluster defined for "{args.cluster}" cluster in [services] section of the config file.')
-            print(f'Check {config_files["REDIS_CONFIG"]}')
-            sys.exit(1)
-
-        if subcluster not in secrets[args.cluster]:
-            print(f'ERROR: no such {descr}subcluster defined for "{args.cluster}" cluster in the password file.')
-            print(f'Check {config_files["REDIS_SECRETS"]}')
-            sys.exit(1)
-
-        if not db_arg_check:
-            continue
-
-        if args.db not in config['services'][args.cluster][subcluster]:
-            print(f'ERROR: no such db defined for "{args.cluster}" cluster and "{subcluster}" {descr}subcluster in [services] section of the config file.')
-            print(f'Check {config_files["REDIS_CONFIG"]}')
-            sys.exit(1)
-
-        if args.db not in secrets[args.cluster][subcluster]:
-            print(f'ERROR: no such db defined for "{args.cluster}" cluster and "{subcluster}" {descr}subcluster in the password file.')
-            print(f'Check {config_files["REDIS_SECRETS"]}')
-            sys.exit(1)

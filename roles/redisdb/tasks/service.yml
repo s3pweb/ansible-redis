@@ -42,10 +42,10 @@
     chain: OUTPUT
     protocol: tcp
     uid_owner: 64446
-    destination_port: "{{redis_port + services[cluster][subcluster][service]['port_offset']}}"
+    destination_port: "{{redis_port + services[service]['port_offset']}}"
     jump: DNAT
-    to_destination: ":{{haproxy_redis_local_port + services[cluster][subcluster][service]['port_offset']}}"
-    comment: "iptables_sentinel_forward_{{redis_port + services[cluster][subcluster][service]['port_offset']}}"
+    to_destination: ":{{haproxy_redis_local_port + services[service]['port_offset']}}"
+    comment: "iptables_sentinel_forward_{{redis_port + services[service]['port_offset']}}"
 
 # Add configs
 - name: ">> {{service}} << Add redis.conf"
@@ -130,15 +130,9 @@
   command: docker restart haproxy-{{service}}
   when: "restart_var is defined and 'haproxy' in restart_var"
 
-# Custom subcluster is used when we need to crete new subcluster and connect it as replicas of parent subcluster
-# in order to migrade some services from parent (original) subcluster
-- set_fact:
-    parent_subcluster_var: "{{subcluster}}"
-  when: "parent_subcluster_var is not defined"
-
 # Configure roles
 - name: ">> {{service}} << Figure out current master using local python script"
-  shell: /opt/cent/bin/redis-get-master.py --cluster {{cluster}} --db {{service}} --subcluster {{parent_subcluster_var}}
+  shell: /opt/cent/bin/redis-get-master.py --db {{service}}
   register: current_master
   changed_when: false
 
@@ -148,8 +142,8 @@
 
 - name: ">> {{service}} << Check if node is configured as master/slave"
   shell: |
-      /usr/bin/redis-cli -h localhost -p {{haproxy_redis_local_port + services[cluster][subcluster][service]['port_offset']}} \
-                         -a {{secrets[cluster][subcluster][service]['password']}} info Replication | grep 'master_link_status:up\|role:master' || true
+      /usr/bin/redis-cli -h localhost -p {{haproxy_redis_local_port + services[service]['port_offset']}} \
+                         -a {{secrets[service]['password']}} info Replication | grep 'master_link_status:up\|role:master' || true
   args:
     executable: /bin/bash
   register: redis_role
@@ -158,8 +152,8 @@
 
 - name: ">> {{service}} << Configure default master instance"
   command: |
-      /usr/bin/redis-cli -h localhost -p {{haproxy_redis_local_port + services[cluster][subcluster][service]['port_offset']}} \
-                         -a {{secrets[cluster][subcluster][service]['password']}} slaveof no one
+      /usr/bin/redis-cli -h localhost -p {{haproxy_redis_local_port + services[service]['port_offset']}} \
+                         -a {{secrets[service]['password']}} slaveof no one
   when:
     - 'ansible_default_ipv4.address == current_master.stdout and ("master_link_status:up" != redis_role.stdout)'
     - 'ansible_default_ipv4.address == current_master.stdout and ("role:master" != redis_role.stdout)'
@@ -167,10 +161,10 @@
 
 - name: ">> {{service}} << Configure default slave instance"
   command: |
-      /usr/bin/redis-cli -h localhost -p {{haproxy_redis_local_port + services[cluster][subcluster][service]['port_offset']}} \
-                         -a {{secrets[cluster][subcluster][service]['password']}} \
+      /usr/bin/redis-cli -h localhost -p {{haproxy_redis_local_port + services[service]['port_offset']}} \
+                         -a {{secrets[service]['password']}} \
                          slaveof {{current_master.stdout}} \
-                         {{haproxy_redis_local_port + services[cluster][subcluster][service]['port_offset']}}
+                         {{haproxy_redis_local_port + services[service]['port_offset']}}
   when:
     - 'ansible_default_ipv4.address != current_master.stdout and ("master_link_status:up" != redis_role.stdout)'
     - 'ansible_default_ipv4.address != current_master.stdout and ("role:master" != redis_role.stdout)'

@@ -31,12 +31,12 @@
     }
   },
   "connections": [
-{% for service in services[cluster][subcluster] %}
+{% for service in services %}
     {
       "label": "{{service}}",
       "host": "127.0.0.1",
-      "port": "{{haproxy_redis_ssl_port + services[cluster][subcluster][service]['port_offset']}}",
-      "password": "{{secrets[cluster][subcluster][service]['password']}}",
+      "port": "{{haproxy_redis_ssl_port + services[service]['port_offset']}}",
+      "password": "{{secrets[service]['password']}}",
       "tls": false,
       "dbIndex": "0"
     }{% if not loop.last %},{% endif %}

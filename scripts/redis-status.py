@@ -9,27 +9,25 @@ import time
 import common_redis as common
 
 
-def show_status(args, subcluster, config, secrets):
-    """Show status on a specific cluster and subcluster."""
+def show_status(args, config, secrets):
+    """Show status."""
     domain = CONFIG['domain']
-    databases = {k: v['port_offset'] for k, v in CONFIG['services'][args.cluster][subcluster].items()}
+    databases = {k: v['port_offset'] for k, v in CONFIG['services'].items()}
     databases = {k: databases[k] for k in sorted(databases, key=databases.get)}
     if args.db in databases:
         databases = {args.db: databases[args.db]}
     elif args.db is not None:
-        print(f'No such database for "{args.cluster}" cluster and "{subcluster}" subcluster.')
+        print(f'No such database.')
         print(f'Valid databases are: {list(databases.keys())}')
         sys.exit(1)
 
-    print(f'Cluster: {args.cluster}')
-    print(f'Subcluster: {subcluster}')
     print(f'Databases and port offsets: {databases}')
 
     # Resolve host aliases.
-    host_aliases = [i for i in config['instances'][args.cluster][subcluster]]
+    host_aliases = [i for i in config['instances']]
     hostnames = {}
     for i in range(1, len(host_aliases)+1):
-        host = f'{subcluster}{i}.{args.cluster}.{domain}'
+        host = f'redis{i}.{domain}'
         try:
             hostnames[host] = socket.gethostbyname(host)
         except:
@@ -60,7 +58,7 @@ def show_status(args, subcluster, config, secrets):
 
     redis_obj = common.Redis(args.debug, verbose=False)
     for db, port_offset in databases.items():
-        password = secrets[args.cluster][subcluster][db]['password']
+        password = secrets[db]['password']
         redis_port = config['haproxy_redis_ssl_port'] + port_offset
         direct_redis_port = config['haproxy_redis_local_ssl_port'] + port_offset
         sentinel_port = config['haproxy_sentinel_ssl_port'] + port_offset
@@ -186,7 +184,7 @@ def show_status(args, subcluster, config, secrets):
             sentinel_quorum = len(sentinel_sentinels[host])
             if sentinel_quorum != 2:
                 print(f' 👉 Warning: sentinel at {host} reports incorrect quorum {sentinel_quorum} instead of 2.')
-                print(f' 💡 Please run "/redis_pack/redis-commander.py -c {args.cluster} --subcluster {subcluster} --reset-quorum --sentinel" command for that cluster/host/db.')
+                print(f' 💡 Please run "/redis_pack/redis-commander.py --reset-quorum --sentinel" command for that host/db.')
                 print()
 
 
@@ -213,8 +211,6 @@ def test_redis_write_read(redis_obj, slaves, master_ip, redis_port, password):
 def main():
     """Main."""
     parser = argparse.ArgumentParser(description='Redis database status script')
-    parser.add_argument('--cluster', '-c', help='cluster name', required=True)
-    parser.add_argument('--subcluster', '-s', help='subcluster name')
     parser.add_argument('--db', '-d', help='redis db name')
     parser.add_argument('--list-only', '-l', help='Show the database list only, no checks', action='store_true')
     parser.add_argument('--no-sentinel', '-n', help='Do not query sentinel for consistency check', action='store_true')
@@ -227,12 +223,7 @@ def main():
 
     common.check_arguments(args, CONFIG_FILES, CONFIG, SECRETS, db_arg_check=False)
 
-    if args.subcluster:
-        show_status(args, args.subcluster, CONFIG, SECRETS)
-    else:
-        subclusters = [i for i in CONFIG['instances'][args.cluster]]
-        for subcluster in subclusters:
-            show_status(args, subcluster, CONFIG, SECRETS)
+    show_status(args, CONFIG, SECRETS)
 
 
 if __name__ == '__main__':

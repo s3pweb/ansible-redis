@@ -3,7 +3,6 @@
 - include_vars: roles/redisdb/vars/main.yml
 
 - set_fact:
-    subcluster: "{{ansible_hostname|regex_replace('\\d+$', '')}}"
     # Setup Commander (Redis web UI), one per host
     # https://github.com/joeferner/redis-commander
     # To set SSL certificate, update path in subcluster.yml
@@ -76,7 +75,7 @@
     image: quiq/haproxy_exporter:{{haproxy_exporter_version}}
     command: >
       --web.listen-address=127.0.0.1:9101
-      --haproxy.scrape-uris="{% for service in services[cluster][subcluster] -%}tcp://127.0.0.1:{{haproxy_api_port + services[cluster][subcluster][service]['port_offset']}}/{{service}}{%- if not loop.last -%},{%- endif -%}{% endfor %}"
+      --haproxy.scrape-uris="{% for service in services -%}tcp://127.0.0.1:{{haproxy_api_port + services[service]['port_offset']}}/{{service}}{%- if not loop.last -%},{%- endif -%}{% endfor %}"
     state: started
     restart_policy: always
     network_mode: host
