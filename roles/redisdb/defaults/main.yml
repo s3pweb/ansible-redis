@@ -13,3 +13,16 @@ haproxy_redis_local_port: 46379
 haproxy_redis_local_ssl_port: 56379
 haproxy_redis_ssl_port: 6379
 haproxy_sentinel_ssl_port: 16379
+
+# Setup Commander (Redis web UI), one per host
+# https://github.com/joeferner/redis-commander
+# To set SSL certificate, update path in subcluster.yml
+enable_commander: False
+
+# Setup Redis and Haproxy Exporters, used by Prometheus monitoring, one per host
+# https://github.com/Quiq/redis_exporter
+# https://github.com/Quiq/haproxy_exporter
+enable_exporters: False
+
+# Add backup scripts and cron
+enable_backup: False
