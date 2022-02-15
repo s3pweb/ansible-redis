@@ -24,16 +24,20 @@ def get_current_master(db):
     prefix = hostname.split('.')[0]
     prefix = ''.join([i for i in prefix if not i.isdigit()])
 
+    ext = ''
+    if len(hostname.split('.')) > 1:
+        ext = '.' + '.'.join(hostname.split('.')[1:])
+
     # Query sentinel
     for i in range(1, 4):
-        host = prefix + str(i) + '.' + '.'.join(hostname.split('.')[1:])
+        host = prefix + str(i) + ext
         master_ip = redis_obj.run_command(host, sentinel_port, password, 'SENTINEL GET-MASTER-ADDR-BY-NAME default')
         if master_ip:
             break
 
     if not master_ip:
         # Return the IP of the first db, usually srv1.
-        master_ip = socket.gethostbyname(prefix + '1' + '.' + '.'.join(hostname.split('.')[1:]))
+        master_ip = socket.gethostbyname(prefix + '1' + ext)
     else:
         master_ip = master_ip[0].decode()
 
