@@ -89,7 +89,7 @@
 - name: Iterate over services
   include_tasks: service.yml
   with_dict:
-    - "{{servicelist}}"
+    - "{{services}}"
   loop_control:
     loop_var: service_item
   vars:
