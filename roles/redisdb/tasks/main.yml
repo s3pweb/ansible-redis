@@ -81,8 +81,8 @@
 - name: Pull docker images
   command: docker pull {{item}}
   with_items:
-    - {{redis_image}}:{{redis_version}}
-    - {{haproxy_image}}:{{haproxy_version}}
+    - "{{redis_image}}:{{redis_version}}"
+    - "{{haproxy_image}}:{{haproxy_version}}"
   register: docker_pull
   changed_when: '"Downloaded newer image" in docker_pull.stdout'
 
@@ -105,7 +105,7 @@
   docker_container:
     name: redis-commander
     labels: {"name": "redis-commander"}
-    image: {{redis_commander_image}}:{{redis_commander_version}}
+    image: "{{redis_commander_image}}:{{redis_commander_version}}"
     state: started
     restart_policy: always
     network_mode: host
@@ -132,7 +132,7 @@
   docker_container:
     name: redis_exporter
     labels: {"name": "redis_exporter"}
-    image: {{redis_exporter_image}}:{{redis_exporter_version}}
+    image: "{{redis_exporter_image}}:{{redis_exporter_version}}"
     command: -web.listen-address=127.0.0.1:9121 -redis.file=/redis_exporter.config
     state: started
     restart_policy: always
@@ -151,7 +151,7 @@
   docker_container:
     name: haproxy_exporter
     labels: {"name": "haproxy_exporter"}
-    image: {{haproxy_exporter_image}}:{{haproxy_exporter_version}}
+    image: "{{haproxy_exporter_image}}:{{haproxy_exporter_version}}"
     command: >
       --web.listen-address=127.0.0.1:9101
       --haproxy.scrape-uris="{% for service in services -%}tcp://127.0.0.1:{{haproxy_api_port + services[service]['port_offset']}}/{{service}}{%- if not loop.last -%},{%- endif -%}{% endfor %}"
