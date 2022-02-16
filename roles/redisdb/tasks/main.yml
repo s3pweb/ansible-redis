@@ -81,8 +81,8 @@
 - name: Pull docker images
   command: docker pull {{item}}
   with_items:
-    - redis:{{redis_version}}
-    - haproxy:{{haproxy_version}}
+    - {{redis_image}}:{{redis_version}}
+    - {{haproxy_image}}:{{haproxy_version}}
   register: docker_pull
   changed_when: '"Downloaded newer image" in docker_pull.stdout'
 
@@ -105,7 +105,7 @@
   docker_container:
     name: redis-commander
     labels: {"name": "redis-commander"}
-    image: quiq/redis-commander:{{redis_commander_version}}
+    image: {{redis_commander_image}}:{{redis_commander_version}}
     state: started
     restart_policy: always
     network_mode: host
@@ -132,7 +132,7 @@
   docker_container:
     name: redis_exporter
     labels: {"name": "redis_exporter"}
-    image: quiq/redis_exporter:{{redis_exporter_version}}
+    image: {{redis_exporter_image}}:{{redis_exporter_version}}
     command: -web.listen-address=127.0.0.1:9121 -redis.file=/redis_exporter.config
     state: started
     restart_policy: always
@@ -151,7 +151,7 @@
   docker_container:
     name: haproxy_exporter
     labels: {"name": "haproxy_exporter"}
-    image: quiq/haproxy_exporter:{{haproxy_exporter_version}}
+    image: {{haproxy_exporter_image}}:{{haproxy_exporter_version}}
     command: >
       --web.listen-address=127.0.0.1:9101
       --haproxy.scrape-uris="{% for service in services -%}tcp://127.0.0.1:{{haproxy_api_port + services[service]['port_offset']}}/{{service}}{%- if not loop.last -%},{%- endif -%}{% endfor %}"
@@ -170,7 +170,7 @@
   when: enable_backup
 
 - name: Copy redis backup script
-  copy: src={{item}} dest=/opt/ mode=0755
+  copy: src=../../../{{item}} dest=/opt/ mode=0755
   with_items:
     - scripts/common_redis.py
     - scripts/redis-backup.py
@@ -183,6 +183,11 @@
 - set_fact:
     run_minute="{{ 14|random(seed=inventory_hostname) }}"
   when: enable_backup
+
+- name: Install `cron` package
+  apt:
+    name: cron
+    state: present
 
 - name: Add redis-backup cron
   cron:

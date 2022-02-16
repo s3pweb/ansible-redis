@@ -75,7 +75,7 @@
   docker_container:
     name: redis-{{service}}
     labels: {"name": "redis-{{service}}"}
-    image: redis:{{redis_version}}
+    image: {{redis_image}}:{{redis_version}}
     command: redis-server /etc/redis.conf
     state: started
     restart_policy: always
@@ -95,7 +95,7 @@
   docker_container:
     name: sentinel-{{service}}
     labels: {"name": "sentinel-{{service}}"}
-    image: redis:{{redis_version}}
+    image: {{redis_image}}:{{redis_version}}
     command: redis-server /etc/sentinel.conf --sentinel
     state: started
     restart_policy: always
@@ -115,7 +115,7 @@
   docker_container:
     name: haproxy-{{service}}
     labels: {"name": "haproxy-{{service}}"}
-    image: haproxy:{{haproxy_version}}
+    image: {{haproxy_image}}:{{haproxy_version}}
     state: started
     restart_policy: always
     network_mode: host
