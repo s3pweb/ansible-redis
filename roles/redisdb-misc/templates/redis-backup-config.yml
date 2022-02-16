@@ -1,9 +1,0 @@
-haproxy_redis_local_ssl_port: {{haproxy_redis_local_ssl_port}}
-haproxy_sentinel_ssl_port: {{haproxy_sentinel_ssl_port}}
-
-databases:
-{% for service in services %}
-  {{service}}:
-    port_offset: {{services[service]['port_offset']}}
-    password: {{secrets[service]['password']}}
-{% endfor %}
