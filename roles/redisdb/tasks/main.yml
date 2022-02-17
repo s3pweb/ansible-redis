@@ -25,10 +25,10 @@
     - common_redis.py
     - redis-get-master.py
 
-      # - name: Docker python lib
-      #   pip:
-      #     name: ['docker', 'redis']
-      #     executable: pip3
+- name: Docker python lib
+  pip:
+    name: ['docker', 'redis']
+    executable: pip3
 
 # Disable Transparent Huge Pages
 - name: Inject kernel.mm.transparent_hugepage
