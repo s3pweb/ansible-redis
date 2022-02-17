@@ -3,6 +3,7 @@
 
 import argparse
 import socket
+import re
 
 import common_redis as common
 
@@ -19,25 +20,24 @@ def get_current_master(db):
                 sentinel_port = int(line.split(' ')[1]) - 20000
 
     redis_obj = common.Redis(False, verbose=False, timeout=1)
-    hostname = socket.gethostname()
+    fqdn = socket.gethostbyaddr(socket.gethostname())[0]
 
-    prefix = hostname.split('.')[0]
-    prefix = ''.join([i for i in prefix if not i.isdigit()])
+    hostname = fqdn.split('.')[0]
 
     ext = ''
-    if len(hostname.split('.')) > 1:
-        ext = '.' + '.'.join(hostname.split('.')[1:])
+    if len(fqdn.split('.')) > 1:
+        ext = '.' + '.'.join(fqdn.split('.')[1:])
 
     # Query sentinel
     for i in range(1, 4):
-        host = prefix + str(i) + ext
+        host = re.sub('\d+', str(i), hostname) + ext
         master_ip = redis_obj.run_command(host, sentinel_port, password, 'SENTINEL GET-MASTER-ADDR-BY-NAME default')
         if master_ip:
             break
 
     if not master_ip:
         # Return the IP of the first db, usually srv1.
-        master_ip = socket.gethostbyname(prefix + '1' + ext)
+        master_ip = socket.gethostbyname(re.sub('\d+', '1', hostname) + ext)
     else:
         master_ip = master_ip[0].decode()
 
