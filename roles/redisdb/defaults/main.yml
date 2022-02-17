@@ -6,6 +6,8 @@ haproxy_version: 2.4.8-alpine
 redis_image: redis
 redis_version: 6.2.6-alpine
 
+redis_modules: []
+
 redis_exporter_image: quiq/redis_exporter
 redis_exporter_version: 20191114
 
