@@ -76,7 +76,7 @@
     name: redis-{{service}}
     labels: {"name": "redis-{{service}}"}
     image: "{{redis_image}}:{{redis_version}}"
-    command: redis-server /etc/redis.conf
+    command: "{{ redis_command }}"
     state: started
     restart_policy: always
     network_mode: host
@@ -142,7 +142,7 @@
 
 - name: ">> {{service}} << Check if node is configured as master/slave"
   shell: |
-      /usr/bin/redis-cli -h localhost -p {{haproxy_redis_local_port + services[service]['port_offset']}} \
+      /usr/bin/redis-cli --no-auth-warning -h localhost -p {{haproxy_redis_local_port + services[service]['port_offset']}} \
                          -a {{secrets[service]['password']}} info Replication | grep 'master_link_status:up\|role:master' || true
   args:
     executable: /bin/bash
@@ -152,7 +152,7 @@
 
 - name: ">> {{service}} << Configure default master instance"
   command: |
-      /usr/bin/redis-cli -h localhost -p {{haproxy_redis_local_port + services[service]['port_offset']}} \
+      /usr/bin/redis-cli --no-auth-warning -h localhost -p {{haproxy_redis_local_port + services[service]['port_offset']}} \
                          -a {{secrets[service]['password']}} slaveof no one
   when:
     - 'ansible_default_ipv4.address == current_master.stdout and ("master_link_status:up" != redis_role.stdout)'
@@ -161,7 +161,7 @@
 
 - name: ">> {{service}} << Configure default slave instance"
   command: |
-      /usr/bin/redis-cli -h localhost -p {{haproxy_redis_local_port + services[service]['port_offset']}} \
+      /usr/bin/redis-cli --no-auth-warning -h localhost -p {{haproxy_redis_local_port + services[service]['port_offset']}} \
                          -a {{secrets[service]['password']}} \
                          slaveof {{current_master.stdout}} \
                          {{haproxy_redis_local_port + services[service]['port_offset']}}

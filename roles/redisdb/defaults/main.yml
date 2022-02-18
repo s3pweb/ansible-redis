@@ -8,6 +8,8 @@ secrets_directory: ""
 redis_image: redis
 redis_version: 6.2.6-alpine
 
+redis_command: "redis-server /etc/redis.conf"
+
 redis_modules: []
 
 redis_exporter_image: quiq/redis_exporter
