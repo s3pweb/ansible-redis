@@ -13,26 +13,26 @@
 
 - name: ">> {{service}} << Copy certs"
   copy:
-    src: "{{item}}"
+    src: "{{secrets_directory}}{{item}}"
     dest: /data/
   with_items:
-    - "example.crt"
-    - "example.key"
+    - "{{ redis_crt }}"
+    - "{{ redis_key }}"
 
 # SSL certificate names that will be used for haproxy (should be single file)
 - name: ">> {{service}} << Set facts"
   set_fact:
-    crt_file: /data/example.crt
-    key_file: /data/example.key
+    crt_file: "/data/{{ redis_crt }}"
+    key_file: "/data/{{ redis_key }}"
 
 - name: ">> {{service}} << Merge SSL crt and private key into one file for haproxy"
-  shell: cat "{{crt_file}}" "{{key_file}}" > /opt/haproxy/{{service}}/quiq.corp.crt.and.key.pem
+  shell: cat "{{crt_file}}" "{{key_file}}" > /opt/haproxy/{{service}}/full.pem
   args:
-    creates: /opt/haproxy/{{service}}/quiq.corp.crt.and.key.pem
+    creates: /opt/haproxy/{{service}}/full.pem
 
 - name: ">> {{service}} << Set permissions"
   file:
-    path: /opt/haproxy/{{service}}/quiq.corp.crt.and.key.pem
+    path: /opt/haproxy/{{service}}/full.pem
     owner: nobody
     mode: 0640
 
@@ -123,7 +123,7 @@
     user: 65534
     volumes:
       - /opt/haproxy/{{service}}/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
-      - /opt/haproxy/{{service}}/quiq.corp.crt.and.key.pem:/etc/quiq.corp.crt.and.key.pem:ro
+      - /opt/haproxy/{{service}}/full.pem:/etc/full.pem:ro
   register: haproxy_container
 
 - name: ">> {{service}} << Restart haproxy"
