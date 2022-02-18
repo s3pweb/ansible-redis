@@ -57,7 +57,7 @@
 - name: Reserve tcp ports in ephemeral port range
   sysctl: >
     name=net.ipv4.ip_local_reserved_ports
-    value="36379-36479,46379-46479,56379-56479"
+    value="36379-36479,46379-46479,56379-56479,63790-63890"
     state=present
     ignoreerrors=yes
 

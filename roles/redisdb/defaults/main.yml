@@ -30,6 +30,7 @@ haproxy_redis_local_port: 46379
 haproxy_redis_local_ssl_port: 56379
 haproxy_redis_ssl_port: 6379
 haproxy_sentinel_ssl_port: 16379
+haproxy_healthchecker_https_port: 63790
 
 # Setup Commander (Redis web UI), one per host
 # https://github.com/joeferner/redis-commander
