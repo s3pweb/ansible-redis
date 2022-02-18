@@ -96,7 +96,7 @@
     name: sentinel-{{service}}
     labels: {"name": "sentinel-{{service}}"}
     image: "{{redis_image}}:{{redis_version}}"
-    command: redis-server /etc/sentinel.conf --sentinel
+    command: "{{ sentinel_command }}"
     state: started
     restart_policy: always
     network_mode: host

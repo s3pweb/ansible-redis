@@ -12,6 +12,8 @@ redis_command: "redis-server /etc/redis.conf"
 
 redis_modules: []
 
+sentinel_command: "redis-server /etc/sentinel.conf --sentinel"
+
 redis_exporter_image: quiq/redis_exporter
 redis_exporter_version: 20191114
 
