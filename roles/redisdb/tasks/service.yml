@@ -103,7 +103,6 @@
     read_only: True
     user: 64446
     volumes:
-      - /opt/redis/{{service}}/redis.conf:/etc/redis.conf:rw
       - /opt/redis/{{service}}/sentinel.conf:/etc/sentinel.conf:rw
       - /data/{{service}}/sentinel:/data:rw
   register: sentinel_container
