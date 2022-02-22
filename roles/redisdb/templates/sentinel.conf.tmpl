@@ -6,3 +6,4 @@ sentinel monitor default {{instances['srv1']}} {{redis_port + services[service][
 sentinel down-after-milliseconds default 5000
 sentinel parallel-syncs default 2
 sentinel auth-pass default {{secrets[service]['password']}}
+sentinel failover-timeout default 6000

@@ -103,6 +103,7 @@
     read_only: True
     user: 64446
     volumes:
+      - /opt/redis/{{service}}/redis.conf:/etc/redis.conf:rw
       - /opt/redis/{{service}}/sentinel.conf:/etc/sentinel.conf:rw
       - /data/{{service}}/sentinel:/data:rw
   register: sentinel_container
@@ -169,3 +170,13 @@
     - 'ansible_default_ipv4.address != current_master.stdout and ("master_link_status:up" != redis_role.stdout)'
     - 'ansible_default_ipv4.address != current_master.stdout and ("role:master" != redis_role.stdout)'
   no_log: False
+
+- name: ">> {{service}} << Create redis_{{service}}_password docker secret"
+  community.docker.docker_secret:
+    name: "redis_{{service}}_password"
+    data: "{{ secrets[service]['password'] }}"
+    state: present
+    #no_log: true
+  run_once: true
+  delegate_to: "{{ redis_docker_host }}"
+  when: redis_docker_host is defined
