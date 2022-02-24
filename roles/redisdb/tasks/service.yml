@@ -52,6 +52,10 @@
   template: src=redis.conf dest=/opt/redis/{{service}}/ mode=0640 owner=nobody
   register: redis_conf
 
+- name: ">> {{service}} << Add users.acl"
+  template: src=users.acl dest=/opt/redis/{{service}}/ mode=0640 owner=nobody
+  register: users_acl_conf
+
 - name: ">> {{service}} << Add sentinel.conf.tmpl"
   template: src=sentinel.conf.tmpl dest=/opt/redis/{{service}}/ mode=0660 owner=sentinel
   register: sentinel_conf
@@ -84,6 +88,7 @@
     user: 65534
     volumes:
       - /opt/redis/{{service}}/redis.conf:/etc/redis.conf:ro
+      - /opt/redis/{{service}}/users.acl:/etc/redis.users.acl:rw
       - /data/{{service}}/redis:/data:rw
   register: redis_container
 
