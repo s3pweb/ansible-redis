@@ -20,7 +20,7 @@
     create_home: no
 
 - name: Copy redis get-master script
-  copy: src=../../../scripts/{{item}} dest=/opt/cent/bin/ mode=0755
+  template: src=../../../scripts/{{item}} dest=/opt/cent/bin/ mode=0755
   with_items:
     - common_redis.py
     - redis-get-master.py

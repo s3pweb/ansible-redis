@@ -36,8 +36,8 @@ def get_current_master(db):
             break
 
     if not master_ip:
-        # Return the IP of the first db, usually srv1.
-        master_ip = socket.gethostbyname(re.sub('\d+', '1', hostname) + ext)
+        # Fallback to IP of srv1.
+        master_ip = "{{ instances['srv1'] }}"
     else:
         master_ip = master_ip[0].decode()
 
