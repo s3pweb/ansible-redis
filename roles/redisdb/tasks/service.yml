@@ -27,8 +27,6 @@
 
 - name: ">> {{service}} << Merge SSL crt and private key into one file for haproxy"
   shell: cat "{{crt_file}}" "{{key_file}}" > /opt/haproxy/{{service}}/full.pem
-  args:
-    creates: /opt/haproxy/{{service}}/full.pem
 
 - name: ">> {{service}} << Set permissions"
   file:
