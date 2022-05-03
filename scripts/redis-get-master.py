@@ -29,9 +29,8 @@ def get_current_master(db):
         ext = '.' + '.'.join(fqdn.split('.')[1:])
 
     # Query sentinel
-    for i in range(1, 4):
-        host = re.sub('\d+', str(i), hostname) + ext
-        master_ip = redis_obj.run_command(host, sentinel_port, password, 'SENTINEL GET-MASTER-ADDR-BY-NAME default')
+    for each in ["{{ instances['srv1'] }}", "{{ instances['srv2'] }}", "{{ instances['srv3'] }}"]:
+        master_ip = redis_obj.run_command(each, sentinel_port, password, 'SENTINEL GET-MASTER-ADDR-BY-NAME default')
         if master_ip:
             break
 
