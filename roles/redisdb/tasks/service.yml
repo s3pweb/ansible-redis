@@ -10,6 +10,7 @@
     - "/opt/redis/{{service}}"
     - "/data/{{service}}/redis"
     - "/data/{{service}}/sentinel"
+  when: services[service]['update']
 
 - name: ">> {{service}} << Copy certs"
   copy:
@@ -18,21 +19,25 @@
   with_items:
     - "{{ redis_crt }}"
     - "{{ redis_key }}"
+  when: services[service]['update']
 
 # SSL certificate names that will be used for haproxy (should be single file)
 - name: ">> {{service}} << Set facts"
   set_fact:
     crt_file: "/data/{{ redis_crt }}"
     key_file: "/data/{{ redis_key }}"
+  when: services[service]['update']
 
 - name: ">> {{service}} << Merge SSL crt and private key into one file for haproxy"
   shell: cat "{{crt_file}}" "{{key_file}}" > /opt/haproxy/{{service}}/full.pem
+  when: services[service]['update']
 
 - name: ">> {{service}} << Set permissions"
   file:
     path: /opt/haproxy/{{service}}/full.pem
     owner: nobody
     mode: 0640
+  when: services[service]['update']
 
 - name: ">> {{service}} << Forward sentinel over haproxy with iptables"
   ansible.builtin.iptables:
@@ -44,19 +49,23 @@
     jump: DNAT
     to_destination: ":{{haproxy_redis_local_port + services[service]['port_offset']}}"
     comment: "iptables_sentinel_forward_{{redis_port + services[service]['port_offset']}}"
+  when: services[service]['update']
 
 # Add configs
 - name: ">> {{service}} << Add redis.conf"
   template: src=redis.conf dest=/opt/redis/{{service}}/ mode=0640 owner=nobody
   register: redis_conf
+  when: services[service]['update']
 
 - name: ">> {{service}} << Add users.acl"
   template: src=users.acl dest=/opt/redis/{{service}}/ mode=0640 owner=nobody
   register: users_acl_conf
+  when: services[service]['update']
 
 - name: ">> {{service}} << Add sentinel.conf.tmpl"
   template: src=sentinel.conf.tmpl dest=/opt/redis/{{service}}/ mode=0660 owner=sentinel
   register: sentinel_conf
+  when: services[service]['update']
 
 # Sentinel uses sentinel.conf to write temporary configuration like id,
 # so it will be always different from Ansible version, that's why we use tmpl instead
@@ -67,11 +76,12 @@
     remote_src: yes
     owner: sentinel
     mode: 0660
-  when: sentinel_conf.changed
+  when: services[service]['update'] and sentinel_conf.changed
 
 - name: ">> {{service}} << Add haproxy.cfg"
   template: src=haproxy.cfg dest=/opt/haproxy/{{service}}/ mode=0640 owner=nobody
   register: haproxy_cfg
+  when: services[service]['update']
 
 - name: ">> {{service}} << Run redis container"
   docker_container:
@@ -87,12 +97,15 @@
     volumes:
       - /opt/redis/{{service}}/redis.conf:/etc/redis.conf:ro
       - /opt/redis/{{service}}/users.acl:/etc/redis.users.acl:rw
+      - /data/{{redis_crt}}:/opt/ssl/{{redis_crt}}:ro
+      - /data/{{redis_key}}:/opt/ssl/{{redis_key}}:ro
       - /data/{{service}}/redis:/data:rw
   register: redis_container
+  when: services[service]['update']
 
 - name: ">> {{service}} << Restart redis"
   command: docker restart redis-{{service}}
-  when: "restart_var is defined and 'redis' in restart_var"
+  when: "services[service]['update'] and restart_var is defined and 'redis' in restart_var"
 
 - name: ">> {{service}} << Run sentinel container"
   docker_container:
@@ -107,12 +120,15 @@
     user: 64446
     volumes:
       - /opt/redis/{{service}}/sentinel.conf:/etc/sentinel.conf:rw
+      - /data/{{redis_crt}}:/opt/ssl/{{redis_crt}}:ro
+      - /data/{{redis_key}}:/opt/ssl/{{redis_key}}:ro
       - /data/{{service}}/sentinel:/data:rw
   register: sentinel_container
+  when: services[service]['update']
 
 - name: ">> {{service}} << Restart sentinel"
   command: docker restart sentinel-{{service}}
-  when: "restart_var is defined and 'sentinel' in restart_var"
+  when: "services[service]['update'] and restart_var is defined and 'sentinel' in restart_var"
 
 - name: ">> {{service}} << Run haproxy container"
   docker_container:
@@ -128,20 +144,23 @@
       - /opt/haproxy/{{service}}/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
       - /opt/haproxy/{{service}}/full.pem:/etc/full.pem:ro
   register: haproxy_container
+  when: services[service]['update'] and not services[service]['tls']
 
 - name: ">> {{service}} << Restart haproxy"
   command: docker restart haproxy-{{service}}
-  when: "restart_var is defined and 'haproxy' in restart_var"
+  when: "services[service]['update'] and not services[service]['tls'] and restart_var is defined and 'haproxy' in restart_var"
 
 # Configure roles
 - name: ">> {{service}} << Figure out current master using local python script"
   shell: /opt/cent/bin/redis-get-master.py --db {{service}}
   register: current_master
   changed_when: false
+  when: services[service]['update']
 
 - name: ">> {{service}} << Show master"
   debug:
     msg: "Current master is {{current_master.stdout}}"
+  when: services[service]['update']
 
 - name: ">> {{service}} << Check if node is configured as master/slave"
   shell: |
@@ -152,12 +171,14 @@
   register: redis_role
   changed_when: false
   no_log: False
+  when: services[service]['update']
 
 - name: ">> {{service}} << Configure default master instance"
   command: |
       /usr/bin/redis-cli --no-auth-warning -h localhost -p {{haproxy_redis_local_port + services[service]['port_offset']}} \
                          -a {{secrets[service]['password']}} slaveof no one
   when:
+    - "services[service]['update']"
     - 'ansible_default_ipv4.address == current_master.stdout and ("master_link_status:up" != redis_role.stdout)'
     - 'ansible_default_ipv4.address == current_master.stdout and ("role:master" != redis_role.stdout)'
   no_log: False
@@ -169,6 +190,21 @@
                          slaveof {{current_master.stdout}} \
                          {{haproxy_redis_local_port + services[service]['port_offset']}}
   when:
+    - "services[service]['update']"
+    - "not services[service]['tls']"
+    - 'ansible_default_ipv4.address != current_master.stdout and ("master_link_status:up" != redis_role.stdout)'
+    - 'ansible_default_ipv4.address != current_master.stdout and ("role:master" != redis_role.stdout)'
+  no_log: False
+
+- name: ">> {{service}} << Configure default slave instance TLS"
+  command: |
+      /usr/bin/redis-cli --no-auth-warning -h localhost -p {{haproxy_redis_local_port + services[service]['port_offset']}} \
+                         -a {{secrets[service]['password']}} \
+                         slaveof {{current_master.stdout}} \
+                         {{6379 + services[service]['port_offset']}}
+  when:
+    - "services[service]['update']"
+    - "services[service]['tls']"
     - 'ansible_default_ipv4.address != current_master.stdout and ("master_link_status:up" != redis_role.stdout)'
     - 'ansible_default_ipv4.address != current_master.stdout and ("role:master" != redis_role.stdout)'
   no_log: False
@@ -181,4 +217,4 @@
     #no_log: true
   run_once: true
   delegate_to: "{{ redis_docker_host }}"
-  when: redis_docker_host is defined
+  when: services[service]['update'] and redis_docker_host is defined

@@ -2,8 +2,25 @@ dir "/data"
 port {{sentinel_port + services[service]['port_offset']}}
 requirepass {{secrets[service]['password']}}
 sentinel deny-scripts-reconfig yes
+{% if services[service]['tls'] %}
+sentinel monitor default {{instances['srv1']}} {{6379 + services[service]['port_offset']}} 2
+{% else %}
 sentinel monitor default {{instances['srv1']}} {{redis_port + services[service]['port_offset']}} 2
+{% endif %}
 sentinel down-after-milliseconds default 5000
 sentinel parallel-syncs default 2
 sentinel auth-pass default {{secrets[service]['password']}}
 sentinel failover-timeout default 6000
+{% if services[service]['tls'] %}
+tls-replication yes                          
+tls-auth-clients optional                    
+                                             
+#tls-protocols "TLSv1.2"                      
+#tls-ciphersuites TLS_CHACHA20_POLY1305_SHA256
+                                             
+tls-port {{16379 + services[service]['port_offset']}}                               
+                                             
+tls-cert-file /opt/ssl/{{redis_crt}} 
+tls-key-file /opt/ssl/{{redis_key}}         
+tls-ca-cert-file /opt/ssl/{{redis_crt}}
+{% endif %}
