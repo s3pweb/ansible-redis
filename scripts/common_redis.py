@@ -82,7 +82,7 @@ class Redis:
 
         return engine
 
-    def get_client(self, host, port, password):
+    def get_client(self, host, port, password, tls=True):
         """Return client."""
         if 'SSL_VERIFY_FALSE' in os.environ:
             sslverify = 'none'
@@ -90,8 +90,13 @@ class Redis:
             sslverify = 'required'
 
         try:
-            r = redis.Redis(host=host, port=port, password=password, socket_timeout=self.timeout,
+            if tls:
+                r = redis.Redis(host=host, port=port, password=password, socket_timeout=self.timeout,
                             socket_connect_timeout=self.timeout, ssl=True, ssl_cert_reqs=sslverify, ssl_ca_certs=config_files['TLS_CA_CERTS'])
+            else:
+                r = redis.Redis(host=host, port=port, password=password, socket_timeout=self.timeout,
+                            socket_connect_timeout=self.timeout)
+            
             r.ping()
         except (redis.exceptions.ConnectionError, redis.exceptions.ResponseError, redis.exceptions.TimeoutError) as err:
             if self.verbose or self.debug:
@@ -101,13 +106,13 @@ class Redis:
 
         return r
 
-    def run_command(self, host, port, password, cmd):
+    def run_command(self, host, port, password, cmd, tls=True):
         """Run command on Redis or Sentinel."""
         if self.verbose or self.debug:
             print(f'- {host}:{port} {cmd}')
 
         try:
-            r = self.get_client(host, port, password)
+            r = self.get_client(host, port, password, tls)
             if not r:
                 return None
 

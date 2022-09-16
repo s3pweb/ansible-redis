@@ -11,6 +11,12 @@ sentinel down-after-milliseconds default 5000
 sentinel parallel-syncs default 2
 sentinel auth-pass default {{secrets[service]['password']}}
 sentinel failover-timeout default 6000
+
+{% if services[service]['hostname'] %}
+sentinel resolve-hostnames yes
+sentinel announce-hostnames yes
+{% endif %}
+
 {% if services[service]['tls'] %}
 tls-replication yes                          
 tls-auth-clients optional                    

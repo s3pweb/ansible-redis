@@ -30,7 +30,7 @@ def get_current_master(db):
 
     # Query sentinel
     for each in ["{{ instances['srv1'] }}", "{{ instances['srv2'] }}", "{{ instances['srv3'] }}"]:
-        master_ip = redis_obj.run_command(each, sentinel_port, password, 'SENTINEL GET-MASTER-ADDR-BY-NAME default')
+        master_ip = redis_obj.run_command(each, sentinel_port, password, 'SENTINEL GET-MASTER-ADDR-BY-NAME default', tls=False)
         if master_ip:
             break
 
