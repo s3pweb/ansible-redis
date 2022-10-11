@@ -133,7 +133,7 @@
     name: redis_exporter
     labels: {"name": "redis_exporter"}
     image: "{{redis_exporter_image}}:{{redis_exporter_version}}"
-    command: -web.listen-address=127.0.0.1:9121 -redis.file=/redis_exporter.config
+    command: -web.listen-address={{ansible_host}}:9121 -redis.file=/redis_exporter.config
     state: started
     restart_policy: always
     network_mode: host
