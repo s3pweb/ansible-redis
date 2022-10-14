@@ -121,31 +121,6 @@
 
 - name: Restart redis-commander
   command: docker restart redis-commander
-  when: enable_commander and redis_commander_conf.changed
-
-- name: Install redis_exporter.config
-  template: src=redis_exporter.config dest=/opt/redis/ mode=0640 group=nogroup
-  register: redis_exporter_conf
-  when: enable_exporters
-
-- name: Start redis_exporter container
-  docker_container:
-    name: redis_exporter
-    labels: {"name": "redis_exporter"}
-    image: "{{redis_exporter_image}}:{{redis_exporter_version}}"
-    command: -web.listen-address={{ansible_host}}:9121 -redis.file=/redis_exporter.config
-    state: started
-    restart_policy: always
-    network_mode: host
-    user: 65534:65534
-    read_only: True
-    volumes:
-      - /opt/redis/redis_exporter.config:/redis_exporter.config:ro
-  when: enable_exporters
-
-- name: Restart redis_exporter
-  command: docker restart redis_exporter
-  when: enable_exporters and redis_exporter_conf.changed
 
 - name: Start haproxy_exporter container
   docker_container:

@@ -218,3 +218,16 @@
   run_once: true
   delegate_to: "{{ redis_docker_host }}"
   when: services[service]['update'] and redis_docker_host is defined
+
+- name: ">> {{service}} << Redis exporter"
+  docker_container:
+    name: "redis_exporter-{{service}}"
+    labels: {"name": "redis_exporter"}
+    image: "{{redis_exporter_image}}:{{redis_exporter_version}}"
+    command: -web.listen-address={{ansible_host}}:{{9121 + services[service]['port_offset']}} -redis.addr=redis://127.0.0.1:{{46379 + services[service]['port_offset']}} -redis.user=default -redis.password={{secrets[service]['password']}}
+    state: started
+    restart_policy: always
+    network_mode: host
+    user: 65534:65534
+    read_only: True
+  when: enable_exporters
