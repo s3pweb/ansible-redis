@@ -29,6 +29,14 @@
   pip:
     name: ['docker', 'redis']
     executable: pip3
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_version is version('24.04', '<')
+
+- name: Docker python lib
+  apt:
+    package:
+      - python3-docker
+      - python3-redis
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_version is version('24.04', '>=')
 
 # Disable Transparent Huge Pages
 - name: Inject kernel.mm.transparent_hugepage
@@ -142,7 +150,13 @@
   vars:
     packages:
     - redis
-  when: enable_backup
+  when: enable_backup and ansible_distribution == 'Ubuntu' and ansible_distribution_version is version('24.04', '<')
+
+- name: Install pip packages
+  apt:
+    package:
+      - python3-redis
+  when: enable_backup and ansible_distribution == 'Ubuntu' and ansible_distribution_version is version('24.04', '>=')
 
 - name: Copy redis backup script
   copy: src=../../../{{item}} dest=/opt/ mode=0755
